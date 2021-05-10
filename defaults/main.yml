@@ -1,0 +1,12 @@
+---
+
+installation_type: "minimal"
+bindings: "ihc , hue , sonos , unifi"
+uis: "basic , paper , habpanel"
+persistence: "mapdb"
+actions:
+transformations:
+voices:
+misc:
+
+ssh_user: "vagrant"

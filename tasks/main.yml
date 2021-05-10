@@ -1,0 +1,114 @@
+---
+
+- name: Install git packages
+  apt:
+    name:
+      - git
+      - git-crypt
+    state: present
+    update_cache: yes
+
+- name: add Azul Systems Java apt key
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 27BC0C8CB3D81623F59BDADCB1998361219BD9C9
+
+- name: add Azul Systems Java apt repository
+  apt_repository:
+    repo: deb http://repos.azulsystems.com/{{ ansible_distribution|lower }} stable main
+    state: present
+
+- name: install JDK via apt
+  apt:
+    name: zulu-11
+    state: present
+    update_cache: yes
+
+- name: Add OpenHAB APT Key
+  apt_key:
+    url: "https://bintray.com/user/downloadSubjectPublicKey?username=openhab"
+    state: present
+
+- name: Add the OpenHAB APT Repo
+  apt_repository:
+#    repo: "deb http://dl.bintray.com/openhab/apt-repo stable main"
+    repo: "deb https://dl.bintray.com/openhab/apt-repo2 stable main"
+    state: present
+
+- name: Install OpenHAB3
+  apt:
+    name: openhab
+    state: present
+    update_cache: yes
+
+- name: Add user to openhab group
+  user:
+    name: "{{ ssh_user }}"
+    groups: openhab
+    append: yes
+
+# # - name: Remove default /etc/openhab2
+# #   file:
+# #     path: /etc/openhab2
+# #     state: absent
+
+# - name: Create new /etc/openhab2
+- name: Update permissions /etc/openhab
+  file:
+    path: /etc/openhab
+    state: directory
+    owner: openhab
+    group: openhab
+    mode: '02775'
+    recurse: yes
+
+- name: Set-up public key for key based SSH logins.
+  authorized_key:
+    user: "{{ ssh_user }}"
+    state: present
+    key: "{{ lookup('file', '/home/viskum/ansible/ssh_keys/id_mac_rsa.pub') }}"
+
+# # - name: Harden sshd_config
+# #   template:
+# #     src: sshd_config.j2
+# #     dest: /etc/ssh/sshd_config
+# #     owner: root
+# #     group: root
+# #     mode: 0644
+
+# - name: Copy git-crypt key
+#   copy:
+#     src: "~/.ansible/git-crypt/gitcrypt.key"
+#     dest: "/home/{{ ssh_user }}/gitcrypt.key"
+#     owner: "{{ ssh_user }}"
+#     group: "{{ ssh_user }}"
+#     mode: '0644'
+
+# - name: Copy ssh private key
+#   copy:
+#     src: "~/.ansible/ssh_keys/openhab/id_rsa"
+#     dest: "/home/{{ ssh_user }}/.ssh/id_rsa"
+#     owner: "{{ ssh_user }}"
+#     group: "{{ ssh_user }}"
+#     mode: '0644'
+
+# - name: Copy ssh public key
+#   copy:
+#     src: "~/.ansible/ssh_keys/openhab/id_rsa.pub"
+#     dest: "/home/{{ ssh_user }}/.ssh/id_rsa.pub"
+#     owner: "{{ ssh_user }}"
+#     group: "{{ ssh_user }}"
+#     mode: '0644'
+
+# - name: Read-write openhab git checkout from github
+#   git:
+#     repo: git@github.com:eviskum/openhab2.git
+#     dest: /etc/openhab2
+
+# # Clone repository if not cloned
+
+# # Unlock git-crypt
+# # cd... git-crypt unlock /key
+
+# # Openhab2 service enable
+# # Start openhab2 service
