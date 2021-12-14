@@ -21,24 +21,39 @@
 - name: install JDK via apt
   apt:
     name: zulu-11
-    state: present
+    state: latest
     update_cache: yes
 
-- name: Add OpenHAB APT Key
+# - name: Remove old OpenHAB APT Key
+#   apt_key:
+#     url: "https://bintray.com/user/downloadSubjectPublicKey?username=openhab"
+#     state: absent
+
+- name: Add new OpenHAB APT Key
   apt_key:
-    url: "https://bintray.com/user/downloadSubjectPublicKey?username=openhab"
+    url: "https://openhab.jfrog.io/artifactory/api/gpg/key/public"
     state: present
 
-- name: Add the OpenHAB APT Repo
+- name: Remove old OpenHAB APT Repo
   apt_repository:
 #    repo: "deb http://dl.bintray.com/openhab/apt-repo stable main"
     repo: "deb https://dl.bintray.com/openhab/apt-repo2 stable main"
+    state: absent
+
+- name: Remove unstable OpenHAB APT Repo
+  apt_repository:
+    repo: "deb https://openhab.jfrog.io/artifactory/openhab-linuxpkg unstable main"
+    state: present
+
+- name: Add new the OpenHAB APT Repo
+  apt_repository:
+    repo: "deb https://openhab.jfrog.io/artifactory/openhab-linuxpkg stable main"
     state: present
 
 - name: Install OpenHAB3
   apt:
     name: openhab
-    state: present
+    state: latest
     update_cache: yes
 
 - name: Add user to openhab group
